@@ -108,11 +108,6 @@ for level_entry in raw_data:
         }
 
 
-def calc_effective_power(base_power, bonus):
-    """Einfach addieren – keine Multiplikation"""
-    return base_power + bonus
-
-
 def best_tool_combo(target_value, power1, power2, max_tools=40):
     """
     Priorität:
@@ -135,7 +130,6 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
 
     best = None
 
-    # Von maximal viel Slot 1 nach unten testen
     for count1 in range(max_tools, -1, -1):
         power_from_slot1 = count1 * power1
         remaining_target = target_value - power_from_slot1
@@ -165,7 +159,6 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
             }
             break
 
-    # Falls Ziel nicht erreichbar: beste mögliche Kombi innerhalb 40 Tools
     if best is None:
         best_power = -1
         best_candidate = None
@@ -192,22 +185,12 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
 # ==================== EINSTELLUNGEN ====================
 st.header("⚙️ Einstellungen")
 
-col_bonus1, col_bonus2, col_bonus3 = st.columns(3)
-with col_bonus1:
-    slot1_bonus = st.number_input("Bonus Slot 1 (Punkte)", value=0.0, step=1.0)
-with col_bonus2:
-    slot2_bonus = st.number_input("Bonus Slot 2 (Punkte)", value=0.0, step=1.0)
-with col_bonus3:
-    global_bonus = st.number_input("Globaler Bonus (Punkte)", value=0.0, step=1.0)
-
-col_eq1 = st.columns(1)[0]
-with col_eq1:
-    equipment_mauer = st.number_input(
-        "Mauerschutz-Reduktion durch Ausrüstung (%)",
-        value=0.0,
-        step=0.5,
-        help="Wird automatisch vom Zielwert abgezogen"
-    )
+equipment_mauer = st.number_input(
+    "Mauerschutz-Reduktion durch Ausrüstung (%)",
+    value=0.0,
+    step=0.5,
+    help="Wird automatisch vom Zielwert abgezogen"
+)
 
 st.divider()
 
@@ -298,12 +281,12 @@ def show_boss(boss_id):
             base_power1 = to_float(tool1.get("power", 0), 0.0)
             base_power2 = to_float(tool2.get("power", 0), 0.0)
 
-            eff_power1 = calc_effective_power(base_power1, slot1_bonus + global_bonus)
-            eff_power2 = calc_effective_power(base_power2, slot2_bonus + global_bonus)
+            eff_power1 = base_power1
+            eff_power2 = base_power2
 
             target_for_calc = (
                 effective_mauer
-                if calc_mode == "Kompletter Mauerschutz aus JSON"
+                if calc_mode == " Mauerschutz aus dem Spiel"
                 else max(0.0, mauer_target - equipment_mauer)
             )
 
