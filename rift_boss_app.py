@@ -17,9 +17,9 @@ if not BOSS_PATH.exists() or not TOOLS_PATH.exists():
 
 with open(BOSS_PATH, "r", encoding="utf-8") as f:
     raw_data = json.load(f)
+
 with open(TOOLS_PATH, "r", encoding="utf-8") as f:
     tools = json.load(f)
-
 
 def to_int(value, default=0):
     try:
@@ -29,7 +29,6 @@ def to_int(value, default=0):
     except Exception:
         return default
 
-
 def to_float(value, default=0.0):
     try:
         if isinstance(value, str):
@@ -38,6 +37,16 @@ def to_float(value, default=0.0):
     except Exception:
         return default
 
+# Neue Hilfsfunktion: Entfernt unnötige ,00 / .00
+def format_number(num):
+    """Ganze Zahlen ohne Nachkommastellen anzeigen + trailing zeros entfernen"""
+    if isinstance(num, (int, float)):
+        if num == int(num):           # ganze Zahl
+            return str(int(num))
+        else:
+            # trailing zeros entfernen (z. B. 12.50 → 12.5, 12.00 → 12)
+            return f"{num:.2f}".rstrip('0').rstrip('.')
+    return str(num)
 
 # Boss-Daten
 boss_data = {
@@ -49,9 +58,7 @@ for level_entry in raw_data:
     boss_id = int(level_entry["raidBossID"])
     if boss_id not in boss_data:
         continue
-
     level = int(level_entry["level"])
-
     if level not in boss_data[boss_id]["data"]:
         seconds = int(level_entry.get("wallRegenerationTime", 1200))
         mauerzeit = f"{seconds//60:02d}:{seconds%60:02d}"
@@ -60,12 +67,10 @@ for level_entry in raw_data:
             "innenhof_kap": int(level_entry.get("courtyardSize", 0)),
             "phasen": {},
         }
-
     for phase_idx, stage in enumerate(level_entry.get("stages", [])):
         phase = phase_idx
         effects = stage.get("defenderBattleEffects", "")
         effect_dict = {}
-
         for part in effects.split(","):
             if "&" in part:
                 try:
@@ -107,15 +112,7 @@ for level_entry in raw_data:
             },
         }
 
-
 def best_tool_combo(target_value, power1, power2, max_tools=40):
-    """
-    Priorität:
-    1. Ziel MUSS erfüllt werden, wenn es mit max_tools überhaupt möglich ist
-    2. Dabei Slot 1 so stark wie möglich ausnutzen
-    3. Slot 2 nur für den Rest
-    4. Slot1 + Slot2 zusammen maximal 40
-    """
     if target_value <= 0:
         return {
             "count1": 0,
@@ -124,16 +121,13 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
             "total_power": 0.0,
             "remaining": 0.0,
         }
-
     if power1 <= 0 and power2 <= 0:
         return None
 
     best = None
-
     for count1 in range(max_tools, -1, -1):
         power_from_slot1 = count1 * power1
         remaining_target = target_value - power_from_slot1
-
         if remaining_target <= 0:
             best = {
                 "count1": count1,
@@ -143,12 +137,10 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
                 "remaining": 0.0,
             }
             break
-
         if power2 > 0:
             count2_needed = math.ceil(remaining_target / power2)
         else:
             count2_needed = float("inf")
-
         if count1 + count2_needed <= max_tools:
             best = {
                 "count1": count1,
@@ -162,11 +154,9 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
     if best is None:
         best_power = -1
         best_candidate = None
-
         for count1 in range(max_tools + 1):
             count2 = max_tools - count1
             total_power = count1 * power1 + count2 * power2
-
             if total_power > best_power:
                 best_power = total_power
                 best_candidate = {
@@ -176,47 +166,38 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
                     "total_power": total_power,
                     "remaining": max(0.0, target_value - total_power),
                 }
-
         best = best_candidate
-
     return best
-
 
 # ==================== EINSTELLUNGEN ====================
 st.header("⚙️ Einstellungen")
-
 equipment_mauer = st.number_input(
     "Mauerschutz-Reduktion durch Ausrüstung (%)",
     value=0.0,
     step=0.5,
     help="Wird automatisch vom Zielwert abgezogen"
 )
-
 st.divider()
 
 tab1, tab2 = st.tabs(["👑 Herrin des Verfalls", "🍄 Myzel-Souverän"])
 
-
 def show_boss(boss_id):
     boss_name = boss_data[boss_id]["name"]
     levels = sorted(boss_data[boss_id]["data"].keys())
-
     col_sel, col_innen = st.columns([2, 1])
     with col_sel:
         level = st.selectbox("Level", levels, key=f"level_{boss_id}")
         available_phases = sorted(boss_data[boss_id]["data"][level]["phasen"].keys())
         phase = st.selectbox("Phase", available_phases, key=f"phase_{boss_id}")
-
     base = boss_data[boss_id]["data"][level]
     phase_data = base["phasen"].get(phase, {})
     e = phase_data.get("einheiten", {})
-
     innen_a = e.get("innen_a", 0)
     innen_b = e.get("innen_b", 0)
 
     with col_innen:
         st.metric("🏰 Gesamt Truppen", f"{innen_a + innen_b:,}")
-        st.caption(f"Innenhof A: {innen_a:,} | B: {innen_b:,}")
+        st.caption(f"Nahdeff: {innen_a:,} | Ferndeff: {innen_b:,}")
 
     st.subheader(f"Level {level} – Phase {phase} – {boss_name}")
 
@@ -232,12 +213,11 @@ def show_boss(boss_id):
         st.metric("Gesundheit", phase_data.get("gesundheit", "–"))
     with c4:
         st.metric("🛡️ Mauerschutz", f"{mauer_schutz_wert}%")
-        st.caption(f"→ Effektiv: **{effective_mauer:.1f}%**")
+        st.caption(f"→ Effektiv: **{format_number(effective_mauer)}%**")
     with c5:
         st.metric("🏰 Innenhof-Kampfkraft", phase_data.get("innenhof_kampf", "–"))
 
     st.divider()
-
     st.subheader("🧮 Berechnung gegen Mauerschutz")
 
     calc_mode = st.radio(
@@ -280,13 +260,12 @@ def show_boss(boss_id):
         if tool1 and tool2:
             base_power1 = to_float(tool1.get("power", 0), 0.0)
             base_power2 = to_float(tool2.get("power", 0), 0.0)
-
             eff_power1 = base_power1
             eff_power2 = base_power2
 
             target_for_calc = (
                 effective_mauer
-                if calc_mode == " Mauerschutz aus dem Spiel"
+                if calc_mode == "Kompletter Mauerschutz aus JSON"
                 else max(0.0, mauer_target - equipment_mauer)
             )
 
@@ -297,18 +276,16 @@ def show_boss(boss_id):
                 return
 
             st.success("**Ergebnis**")
-
             info1, info2, info3 = st.columns(3)
             with info1:
-                st.metric("Effektiver Zielwert", f"{target_for_calc:.1f}%")
+                st.metric("Effektiver Zielwert", f"{format_number(target_for_calc)}%")
             with info2:
-                st.metric("Eff. Power Slot 1", f"{eff_power1:.2f}")
+                st.metric("Eff. Power Slot 1", format_number(eff_power1))
             with info3:
-                st.metric("Eff. Power Slot 2", f"{eff_power2:.2f}")
+                st.metric("Eff. Power Slot 2", format_number(eff_power2))
 
             st.divider()
             st.subheader("🛡️ Berechnung gegen Mauerschutz")
-
             r1, r2, r3 = st.columns(3)
             with r1:
                 st.write(f"**{tool1['name']}**")
@@ -318,21 +295,19 @@ def show_boss(boss_id):
                 st.metric("Mitnehmen", f"{best_mauer['count2']:,} Stück")
             with r3:
                 st.metric("Gesamt Tools", f"{best_mauer['total_tools']:,} / 40")
-                st.metric("Abgedeckt", f"{best_mauer['total_power']:.2f}")
+                st.metric("Abgedeckt", format_number(best_mauer['total_power']))
 
             if best_mauer["remaining"] <= 0:
                 st.success("✅ Mauerschutz komplett entfernt!")
             else:
                 st.error(
-                    f"❌ Es fehlen noch {best_mauer['remaining']:.2f} Mauerschutz "
+                    f"❌ Es fehlen noch {format_number(best_mauer['remaining'])} Mauerschutz "
                     f"(mit max. 40 Tools nicht möglich)."
                 )
-
         else:
             st.warning("Bitte beide Tools auswählen.")
 
     st.divider()
-
     col_l, col_m, col_r = st.columns(3)
     with col_l:
         st.subheader("🛡️ Linke Flanke")
@@ -343,7 +318,6 @@ def show_boss(boss_id):
     with col_r:
         st.subheader("🛡️ Rechte Flanke")
         st.write(f"**A - Fern**: {e.get('rechte_a', 0):,} | **B - Nah**: {e.get('rechte_b', 0):,}")
-
 
 with tab1:
     show_boss(1)
