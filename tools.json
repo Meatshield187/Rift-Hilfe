@@ -8,13 +8,8 @@
   {"name": "Rift Leiter 500% ", "power": 500, "target": "mauer"},
   {"name": "Mörser", "power": 25, "target": "mauer"},
   {"name": "Fanghakenkannone", "power": 25, "target": "mauer"},
-  {"name": "Rift Ramme 60%", "power": 60, "target": "tor"},
-  {"name": "Rift Ramme 80%", "power": 80, "target": "tor"},
-  {"name": "Rift Ramme 125%", "power": 125, "target": "tor"},
-  {"name": "Rift Ramme 200%", "power": 200, "target": "tor"},
-  {"name": "Rift Ramme 250%", "power": 250, "target": "tor"},
-  {"name": "Rift Ramme 340%", "power": 340, "target": "tor"},
-  {"name": "Rift Ramme 500%", "power": 500, "target": "tor"}
+  {"name": "Ruhmesturm", "power": 0, "target": "mauer"}
+  
 
 
 ]
