@@ -324,7 +324,7 @@ def show_boss(boss_id):
                 st.success("✅ Mauerschutz komplett entfernt!")
             else:
                 st.error(
-                    f"❌ Es fehlen noch {best_mauer['remaining']:.2f} Punkte "
+                    f"❌ Es fehlen noch {best_mauer['remaining']:.2f} Mauerschutz "
                     f"(mit max. 40 Tools nicht möglich)."
                 )
 
