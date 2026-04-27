@@ -10,18 +10,18 @@ Angriffsmuster
 
 Mauer
 
-
 Bei diesem Boss gibt es zwei schwächere Seiten, die beiden Flanke, und die sehr starke Front.
 Die Front lohnt sich spätestens ab Stufe 2 eher nicht zu öffnen, dafür sind die Verluste zu hoch, deswegen konzentrieren wir uns auf die Flanken.
 Bis zum Boss 10 Stehen auf der linken Seite mehr Fernverteidiger und auf der rechten Seite mehr Nahverteitiger. Links greifen wir somit mit Nah Einheiten an und den entsprechenden Riftleitern, wenn noch genug Platz ist, können wir noch mit fanghaken Kanonen auffüllen. Rechts greifen wir dann somit mit Fernkämpfern, Riftleitern und Wandeltürmen (ca bis Boss 9) oder Belagerungsmörsen (ca. ab Boss 9) an.
+Man kann auch die Strategie fahren nur mit Fern angreifen dort kombiniert man eine Seite mit Ruhmesturmen und eine mit Mörsern.
 Zu Empfehlen sind Eventmeteinheiten oder Fleischtruppen zum öffnen der Mauer.
 Es wird grundsätzlich nur mit dem Besten Riftfeldherren angegriffen und Toril.
-Für Toril sind die optimalen Talente zum öffnen der Mauer Flügelschlag, bleibende Wunde, kurzer Prozess und Aspekt des Drachen.
+Für Toril sind die optimalen Talente zum Öffnen der Mauer: Flügelschlag, bleibende Wunde, kurzer Prozess und Aspekt des Drachen.
 Um diese Fähigkeiten so effektiv wie möglich ausnutzen zu können, greifen wir nur in den Wellen 4, 8, 10, 14, 16, 20, 22, 26 an.
 Die anderen Wellen werden mit Füllereinheiten gefüllt, jede Angriffswelle und Seite mit je einer Einheit.
 
-
 Innenhof
+
 
 Am Anfang kann man bis ca Boss 6/7 mit 32 Wölfen und blauen Feldherren angreifen. Hierfür muss der FH möglichst viel Nah, Innenhof und Schildmaiden haben. Des Weiteren sind die Dekos vom Turnier nicht schlecht.
 In anderen Fällen greift man von 100%-40% mit fern an und 40% bis 0% mit Nah.
@@ -31,13 +31,8 @@ In anderen Fällen greift man von 100%-40% mit fern an und 40% bis 0% mit Nah.
 
 
 
-
-
-
-
-
-
 Konstrukte / Dekos
+
 
 Deko
 90% Nah / Fern > Könige
@@ -79,4 +74,3 @@ Geschenke
 1000 Truppen für den Letzten Ansturm > Anwesen
 1000 Truppen für den Letzten Ansturm > Lazarett
 10% Truppen für den Letzten Ansturm > Kaserne
-
