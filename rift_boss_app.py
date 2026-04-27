@@ -166,8 +166,8 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
 st.header("⚙️ Einstellungen")
 equipment_mauer = st.number_input(
     "Mauerschutz-Reduktion durch Ausrüstung (%)",
-    value=0.0,
-    step=0.5,
+    value=0,
+    step=10,
     help="Wird automatisch vom Zielwert abgezogen"
 )
 st.divider()
