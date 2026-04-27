@@ -21,12 +21,12 @@ with open(BOSS_PATH, "r", encoding="utf-8") as f:
 with open(TOOLS_PATH, "r", encoding="utf-8") as f:
     tools = json.load(f)
 
-# Zombi Boss Strategie-Guide laden (wird direkt angezeigt)
+# Zombi Boss Strategie-Guide laden
 ZOMBI_BOSS_PATH = Path("Zombi Boss.txt")
 if ZOMBI_BOSS_PATH.exists():
     with open(ZOMBI_BOSS_PATH, "r", encoding="utf-8") as f:
         zombi_boss_raw = f.read()
-        zombi_boss_text = zombi_boss_raw.lstrip('\ufeff')  # BOM entfernen
+        zombi_boss_text = zombi_boss_raw.lstrip('\ufeff')
 else:
     zombi_boss_text = "❌ Zombi Boss.txt nicht gefunden!"
 
@@ -46,18 +46,14 @@ def to_float(value, default=0.0):
     except Exception:
         return default
 
-# Neue Hilfsfunktion: Entfernt unnötige ,00 / .00
 def format_number(num):
-    """Ganze Zahlen ohne Nachkommastellen anzeigen + trailing zeros entfernen"""
     if isinstance(num, (int, float)):
-        if num == int(num):           # ganze Zahl
+        if num == int(num):
             return str(int(num))
         else:
-            # trailing zeros entfernen (z. B. 12.50 → 12.5, 12.00 → 12)
             return f"{num:.2f}".rstrip('0').rstrip('.')
     return str(num)
 
-# Boss-Daten
 boss_data = {
     1: {"name": "Herrin des Verfalls", "data": {}},
     2: {"name": "Myzel-Souverän", "data": {}},
@@ -123,13 +119,7 @@ for level_entry in raw_data:
 
 def best_tool_combo(target_value, power1, power2, max_tools=40):
     if target_value <= 0:
-        return {
-            "count1": 0,
-            "count2": 0,
-            "total_tools": 0,
-            "total_power": 0.0,
-            "remaining": 0.0,
-        }
+        return {"count1": 0, "count2": 0, "total_tools": 0, "total_power": 0.0, "remaining": 0.0}
     if power1 <= 0 and power2 <= 0:
         return None
 
@@ -138,26 +128,14 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
         power_from_slot1 = count1 * power1
         remaining_target = target_value - power_from_slot1
         if remaining_target <= 0:
-            best = {
-                "count1": count1,
-                "count2": 0,
-                "total_tools": count1,
-                "total_power": power_from_slot1,
-                "remaining": 0.0,
-            }
+            best = {"count1": count1, "count2": 0, "total_tools": count1, "total_power": power_from_slot1, "remaining": 0.0}
             break
         if power2 > 0:
             count2_needed = math.ceil(remaining_target / power2)
         else:
             count2_needed = float("inf")
         if count1 + count2_needed <= max_tools:
-            best = {
-                "count1": count1,
-                "count2": count2_needed,
-                "total_tools": count1 + count2_needed,
-                "total_power": power_from_slot1 + count2_needed * power2,
-                "remaining": 0.0,
-            }
+            best = {"count1": count1, "count2": count2_needed, "total_tools": count1 + count2_needed, "total_power": power_from_slot1 + count2_needed * power2, "remaining": 0.0}
             break
 
     if best is None:
@@ -168,24 +146,12 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
             total_power = count1 * power1 + count2 * power2
             if total_power > best_power:
                 best_power = total_power
-                best_candidate = {
-                    "count1": count1,
-                    "count2": count2,
-                    "total_tools": max_tools,
-                    "total_power": total_power,
-                    "remaining": max(0.0, target_value - total_power),
-                }
+                best_candidate = {"count1": count1, "count2": count2, "total_tools": max_tools, "total_power": total_power, "remaining": max(0.0, target_value - total_power)}
         best = best_candidate
     return best
 
-# ==================== EINSTELLUNGEN ====================
 st.header("⚙️ Einstellungen")
-equipment_mauer = st.number_input(
-    "Mauerschutz-Reduktion durch Ausrüstung (%)",
-    value=0.0,
-    step=0.5,
-    help="Wird automatisch vom Zielwert abgezogen"
-)
+equipment_mauer = st.number_input("Mauerschutz-Reduktion durch Ausrüstung (%)", value=0.0, step=0.5, help="Wird automatisch vom Zielwert abgezogen")
 st.divider()
 
 tab1, tab2 = st.tabs(["👑 Herrin des Verfalls", "🍄 Myzel-Souverän"])
@@ -214,56 +180,31 @@ def show_boss(boss_id):
     effective_mauer = max(0.0, mauer_schutz_wert - equipment_mauer)
 
     c1, c2, c3, c4, c5 = st.columns(5)
-    with c1:
-        st.metric("Maueraufladezeit", base["mauer_aufladezeit"])
-    with c2:
-        st.metric("Innenhof-Kapazität", f"{base['innenhof_kap']:,}")
-    with c3:
-        st.metric("Gesundheit", phase_data.get("gesundheit", "–"))
+    with c1: st.metric("Maueraufladezeit", base["mauer_aufladezeit"])
+    with c2: st.metric("Innenhof-Kapazität", f"{base['innenhof_kap']:,}")
+    with c3: st.metric("Gesundheit", phase_data.get("gesundheit", "–"))
     with c4:
         st.metric("🛡️ Mauerschutz", f"{mauer_schutz_wert}%")
         st.caption(f"→ Effektiv: **{format_number(effective_mauer)}%**")
-    with c5:
-        st.metric("🏰 Innenhof-Kampfkraft", phase_data.get("innenhof_kampf", "–"))
+    with c5: st.metric("🏰 Innenhof-Kampfkraft", phase_data.get("innenhof_kampf", "–"))
 
     st.divider()
     st.subheader("🧮 Berechnung gegen Mauerschutz")
 
-    calc_mode = st.radio(
-        "Zielwert",
-        ["Kompletter Mauerschutz aus JSON", "Eigener Zielwert"],
-        horizontal=True,
-        key=f"calc_mode_{boss_id}",
-    )
+    calc_mode = st.radio("Zielwert", ["Kompletter Mauerschutz aus JSON", "Eigener Zielwert"], horizontal=True, key=f"calc_mode_{boss_id}")
 
     if calc_mode == "Kompletter Mauerschutz aus JSON":
         mauer_target = mauer_schutz_wert
     else:
-        mauer_target = st.number_input(
-            "Eigener Zielwert Mauerschutz (%)",
-            min_value=0,
-            value=mauer_schutz_wert,
-            step=1,
-            key=f"mauer_target_{boss_id}",
-        )
+        mauer_target = st.number_input("Eigener Zielwert Mauerschutz (%)", min_value=0, value=mauer_schutz_wert, step=1, key=f"mauer_target_{boss_id}")
 
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("**🔥 Slot 1 (Priorität)**")
-        tool1 = st.selectbox(
-            "Tool 1",
-            tools,
-            format_func=lambda x: x.get("name", "Unbekannt"),
-            key=f"tool1_{boss_id}"
-        )
+        tool1 = st.selectbox("Tool 1", tools, format_func=lambda x: x.get("name", "Unbekannt"), key=f"tool1_{boss_id}")
     with col2:
         st.markdown("**⚙️ Slot 2 (ergänzt nur wenn nötig)**")
-        tool2 = st.selectbox(
-            "Tool 2",
-            tools,
-            format_func=lambda x: x.get("name", "Unbekannt"),
-            key=f"tool2_{boss_id}"
-        )
+        tool2 = st.selectbox("Tool 2", tools, format_func=lambda x: x.get("name", "Unbekannt"), key=f"tool2_{boss_id}")
 
     if st.button("🚀 Berechnen", type="primary", use_container_width=True, key=f"calc_{boss_id}"):
         if tool1 and tool2:
@@ -272,12 +213,7 @@ def show_boss(boss_id):
             eff_power1 = base_power1
             eff_power2 = base_power2
 
-            target_for_calc = (
-                effective_mauer
-                if calc_mode == "Kompletter Mauerschutz aus JSON"
-                else max(0.0, mauer_target - equipment_mauer)
-            )
-
+            target_for_calc = effective_mauer if calc_mode == "Kompletter Mauerschutz aus JSON" else max(0.0, mauer_target - equipment_mauer)
             best_mauer = best_tool_combo(target_for_calc, eff_power1, eff_power2, max_tools=40)
 
             if best_mauer is None:
@@ -286,12 +222,9 @@ def show_boss(boss_id):
 
             st.success("**Ergebnis**")
             info1, info2, info3 = st.columns(3)
-            with info1:
-                st.metric("Effektiver Zielwert", f"{format_number(target_for_calc)}%")
-            with info2:
-                st.metric("Eff. Power Slot 1", format_number(eff_power1))
-            with info3:
-                st.metric("Eff. Power Slot 2", format_number(eff_power2))
+            with info1: st.metric("Effektiver Zielwert", f"{format_number(target_for_calc)}%")
+            with info2: st.metric("Eff. Power Slot 1", format_number(eff_power1))
+            with info3: st.metric("Eff. Power Slot 2", format_number(eff_power2))
 
             st.divider()
             st.subheader("🛡️ Berechnung gegen Mauerschutz")
@@ -309,10 +242,7 @@ def show_boss(boss_id):
             if best_mauer["remaining"] <= 0:
                 st.success("✅ Mauerschutz komplett entfernt!")
             else:
-                st.error(
-                    f"❌ Es fehlen noch {format_number(best_mauer['remaining'])} Mauerschutz "
-                    f"(mit max. 40 Tools nicht möglich)."
-                )
+                st.error(f"❌ Es fehlen noch {format_number(best_mauer['remaining'])} Mauerschutz (mit max. 40 Tools nicht möglich).")
         else:
             st.warning("Bitte beide Tools auswählen.")
 
@@ -328,27 +258,26 @@ def show_boss(boss_id):
         st.subheader("🛡️ Rechte Flanke")
         st.write(f"**A - Fern**: {e.get('rechte_a', 0):,} | **B - Nah**: {e.get('rechte_b', 0):,}")
 
-    # === NEU: Zombi Boss Strategie direkt aus Datei (kein Link mehr) ===
+    # === Zombi Boss Strategie direkt aus Datei ===
     if boss_id == 1:
         st.divider()
         st.subheader("📜 Zombi Boss – Komplette Strategie")
-        st.caption("Der Text wird direkt aus der Datei „Zombi Boss.txt“ geladen und hier angezeigt.")
+        
 
-        # Schöner formatierter Text
-        st.markdown(zombi_boss_text.replace("Zombi Boss", "**Zombi Boss**")
-                                   .replace("Fähigkeit", "### Fähigkeit")
-                                   .replace("Angriffsmuster", "### Angriffsmuster")
-                                   .replace("Mauer", "#### Mauer")
-                                   .replace("Innenhof", "#### Innenhof")
-                                   .replace("Konstrukte / Dekos", "### Konstrukte / Dekos")
-                                   .replace("Deko", "#### Deko")
-                                   .replace("Rad", "#### Rad")
-                                   .replace("Silbershop", "#### Silbershop")
-                                   .replace("Events", "#### Events")
-                                   .replace("Sceatta", "#### Sceatta")
-                                   .replace("Rubine", "#### Rubine")
-                                   .replace("Echtgeld / Gasha", "#### Echtgeld / Gasha")
-                                   .replace("Geschenke", "#### Geschenke"))
+        # Saubere Formatierung Zeile für Zeile
+        lines = zombi_boss_text.strip().split("\n")
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if line == "Zombi Boss":
+                st.markdown("## Zombi Boss")
+            elif line in ["Fähigkeit", "Angriffsmuster", "Konstrukte / Dekos"]:
+                st.markdown(f"### {line}")
+            elif line in ["Mauer", "Innenhof", "Deko", "Rad", "Silbershop", "Events", "Sceatta", "Rubine", "Echtgeld / Gasha", "Geschenke"]:
+                st.markdown(f"#### {line}")
+            else:
+                st.write(line)
 
 with tab1:
     show_boss(1)
