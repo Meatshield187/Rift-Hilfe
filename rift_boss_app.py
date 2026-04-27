@@ -21,6 +21,15 @@ with open(BOSS_PATH, "r", encoding="utf-8") as f:
 with open(TOOLS_PATH, "r", encoding="utf-8") as f:
     tools = json.load(f)
 
+# Zombi Boss Strategie-Guide laden (wird direkt angezeigt)
+ZOMBI_BOSS_PATH = Path("Zombi Boss.txt")
+if ZOMBI_BOSS_PATH.exists():
+    with open(ZOMBI_BOSS_PATH, "r", encoding="utf-8") as f:
+        zombi_boss_raw = f.read()
+        zombi_boss_text = zombi_boss_raw.lstrip('\ufeff')  # BOM entfernen
+else:
+    zombi_boss_text = "❌ Zombi Boss.txt nicht gefunden!"
+
 def to_int(value, default=0):
     try:
         if isinstance(value, str):
@@ -318,6 +327,28 @@ def show_boss(boss_id):
     with col_r:
         st.subheader("🛡️ Rechte Flanke")
         st.write(f"**A - Fern**: {e.get('rechte_a', 0):,} | **B - Nah**: {e.get('rechte_b', 0):,}")
+
+    # === NEU: Zombi Boss Strategie direkt aus Datei (kein Link mehr) ===
+    if boss_id == 1:
+        st.divider()
+        st.subheader("📜 Zombi Boss – Komplette Strategie")
+        st.caption("Der Text wird direkt aus der Datei „Zombi Boss.txt“ geladen und hier angezeigt.")
+
+        # Schöner formatierter Text
+        st.markdown(zombi_boss_text.replace("Zombi Boss", "**Zombi Boss**")
+                                   .replace("Fähigkeit", "### Fähigkeit")
+                                   .replace("Angriffsmuster", "### Angriffsmuster")
+                                   .replace("Mauer", "#### Mauer")
+                                   .replace("Innenhof", "#### Innenhof")
+                                   .replace("Konstrukte / Dekos", "### Konstrukte / Dekos")
+                                   .replace("Deko", "#### Deko")
+                                   .replace("Rad", "#### Rad")
+                                   .replace("Silbershop", "#### Silbershop")
+                                   .replace("Events", "#### Events")
+                                   .replace("Sceatta", "#### Sceatta")
+                                   .replace("Rubine", "#### Rubine")
+                                   .replace("Echtgeld / Gasha", "#### Echtgeld / Gasha")
+                                   .replace("Geschenke", "#### Geschenke"))
 
 with tab1:
     show_boss(1)
