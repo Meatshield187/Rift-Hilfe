@@ -30,7 +30,7 @@ if ZOMBI_BOSS_PATH.exists():
 else:
     zombi_boss_text = "❌ Zombi Boss.txt nicht gefunden!"
 
-def to_int(value, default=0):
+def to_int(value, default=0.0):
     try:
         if isinstance(value, str):
             value = value.replace("%", "").replace(",", ".").strip()
@@ -38,7 +38,7 @@ def to_int(value, default=0):
     except Exception:
         return default
 
-def to_float(value, default=0.0):
+def to_float(value, default=0):
     try:
         if isinstance(value, str):
             value = value.replace("%", "").replace(",", ".").strip()
@@ -150,11 +150,41 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
         best = best_candidate
     return best
 
+# ==================== EINSTELLUNGEN ====================
 st.header("⚙️ Einstellungen")
-equipment_mauer = st.number_input("Mauerschutz-Reduktion durch Ausrüstung (%)", value=0.0, step=0.5, help="Wird automatisch vom Zielwert abgezogen")
+equipment_mauer = st.number_input(
+    "Mauerschutz-Reduktion durch Ausrüstung (%)",
+    value=0,
+    step=10,
+    help="Wird automatisch vom Zielwert abgezogen"
+)
 st.divider()
 
-tab1, tab2 = st.tabs(["👑 Herrin des Verfalls", "🍄 Myzel-Souverän"])
+# ==================== BOSS AUSWAHL (ganz oben) ====================
+st.header("👑 Boss auswählen")
+boss_choice = st.selectbox(
+    "Welchen Boss möchtest du analysieren?",
+    ["Herrin des Verfalls", "Myzel-Souverän"],
+    index=0,
+    key="boss_selector"
+)
+boss_id = 1 if boss_choice == "Herrin des Verfalls" else 2
+
+# Schöner Banner für den gewählten Boss
+if boss_id == 1:
+    st.markdown("""
+    <div style="background: linear-gradient(90deg, #8B0000, #FF4500); padding: 20px; border-radius: 15px; text-align: center; margin: 15px 0;">
+        <h1 style="color: white; margin: 0;">👑 HERRIN DES VERFALLS</h1>
+        <p style="color: #FFE4E1; margin: 5px 0 0 0; font-size: 18px;">Rift Event Boss • Hohe Mauerschutz-Werte</p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <div style="background: linear-gradient(90deg, #2E8B57, #32CD32); padding: 20px; border-radius: 15px; text-align: center; margin: 15px 0;">
+        <h1 style="color: white; margin: 0;">🍄 MYZEL-SOVERÄN</h1>
+        <p style="color: #E0FFE0; margin: 5px 0 0 0; font-size: 18px;">Rift Event Boss • Myzel-Infektion</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 def show_boss(boss_id):
     boss_name = boss_data[boss_id]["name"]
@@ -258,13 +288,12 @@ def show_boss(boss_id):
         st.subheader("🛡️ Rechte Flanke")
         st.write(f"**A - Fern**: {e.get('rechte_a', 0):,} | **B - Nah**: {e.get('rechte_b', 0):,}")
 
-    # === Zombi Boss Strategie direkt aus Datei ===
+    # === Zombi Boss Strategie (nur bei Herrin) ===
     if boss_id == 1:
         st.divider()
         st.subheader("📜 Zombi Boss – Komplette Strategie")
-        
+        st.caption("Der Text wird direkt aus der Datei „Zombi Boss.txt“ geladen und hier angezeigt.")
 
-        # Saubere Formatierung Zeile für Zeile
         lines = zombi_boss_text.strip().split("\n")
         for line in lines:
             line = line.strip()
@@ -279,7 +308,5 @@ def show_boss(boss_id):
             else:
                 st.write(line)
 
-with tab1:
-    show_boss(1)
-with tab2:
-    show_boss(2)
+# Boss-Inhalt anzeigen (nach Auswahl oben)
+show_boss(boss_id)
