@@ -76,3 +76,7 @@ Echtgeld / Gasha
 200% Nah / Fern > Kornis / Wohnhäuser > wenn extreme Mittel nötig sind
 120% Einheitenlimit Front / Flanke > Kornis / Wohnhäuser > wenn extreme Mittel nötig sind
 Geschenke
+1000 Truppen für den Letzten Ansturm > Anwesen
+1000 Truppen für den Letzten Ansturm > Lazarett
+10% Truppen für den Letzten Ansturm > Kaserne
+
