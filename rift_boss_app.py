@@ -7,6 +7,18 @@ st.set_page_config(page_title="Rift Event Boss Viewer", layout="wide")
 st.title("🔥 RIFT EVENT BOSS VIEWER")
 st.caption("Herrin des Verfalls + Myzel-Souverän – JSON-Schutzwerte + Tool-Rechner")
 
+# ==================== LEGENDE / INHALTSVERZEICHNIS (oben rechts auf der Hauptseite) ====================
+col_main, col_legend = st.columns([5, 2])
+with col_legend:
+    st.markdown("**📋 Inhaltsverzeichnis**")
+    st.markdown("""
+    - [Level & Phase](#level--phase--boss)
+    - [Mauerschutz-Rechner](#berechnung-gegen-mauerschutz)
+    - [Flanken-Übersicht](#linke-flanke--front--rechte-flanke)
+    - [Zombi-Strategie](#zombi-boss--komplette-strategie)
+    """)
+    st.caption("Klicke → springt direkt dorthin")
+
 # JSONs laden
 BOSS_PATH = Path("combined_raidboss_sortiert.json")
 TOOLS_PATH = Path("tools.json")
@@ -30,7 +42,7 @@ if ZOMBI_BOSS_PATH.exists():
 else:
     zombi_boss_text = "❌ Zombi Boss.txt nicht gefunden!"
 
-def to_int(value, default=0.0):
+def to_int(value, default=0):
     try:
         if isinstance(value, str):
             value = value.replace("%", "").replace(",", ".").strip()
@@ -38,7 +50,7 @@ def to_int(value, default=0.0):
     except Exception:
         return default
 
-def to_float(value, default=0):
+def to_float(value, default=0.0):
     try:
         if isinstance(value, str):
             value = value.replace("%", "").replace(",", ".").strip()
@@ -154,8 +166,8 @@ def best_tool_combo(target_value, power1, power2, max_tools=40):
 st.header("⚙️ Einstellungen")
 equipment_mauer = st.number_input(
     "Mauerschutz-Reduktion durch Ausrüstung (%)",
-    value=0,
-    step=10,
+    value=0.0,
+    step=0.5,
     help="Wird automatisch vom Zielwert abgezogen"
 )
 st.divider()
@@ -204,7 +216,7 @@ def show_boss(boss_id):
         st.metric("🏰 Gesamt Truppen", f"{innen_a + innen_b:,}")
         st.caption(f"Nahdeff: {innen_a:,} | Ferndeff: {innen_b:,}")
 
-    st.subheader(f"Level {level} – Phase {phase} – {boss_name}")
+    st.subheader(f"Level {level} – Phase {phase} – {boss_name}", anchor="level--phase--boss")
 
     mauer_schutz_wert = to_int(phase_data.get("mauer_schutz", "0%"), 0)
     effective_mauer = max(0.0, mauer_schutz_wert - equipment_mauer)
@@ -219,7 +231,7 @@ def show_boss(boss_id):
     with c5: st.metric("🏰 Innenhof-Kampfkraft", phase_data.get("innenhof_kampf", "–"))
 
     st.divider()
-    st.subheader("🧮 Berechnung gegen Mauerschutz")
+    st.subheader("🧮 Berechnung gegen Mauerschutz", anchor="berechnung-gegen-mauerschutz")
 
     calc_mode = st.radio("Zielwert", ["Kompletter Mauerschutz aus JSON", "Eigener Zielwert"], horizontal=True, key=f"calc_mode_{boss_id}")
 
@@ -279,7 +291,7 @@ def show_boss(boss_id):
     st.divider()
     col_l, col_m, col_r = st.columns(3)
     with col_l:
-        st.subheader("🛡️ Linke Flanke")
+        st.subheader("🛡️ Linke Flanke", anchor="linke-flanke--front--rechte-flanke")
         st.write(f"**A - Fern**: {e.get('linke_a', 0):,} | **B - Nah**: {e.get('linke_b', 0):,}")
     with col_m:
         st.subheader("🛡️ Front")
@@ -291,7 +303,7 @@ def show_boss(boss_id):
     # === Zombi Boss Strategie (nur bei Herrin) ===
     if boss_id == 1:
         st.divider()
-        st.subheader("📜 Zombi Boss – Komplette Strategie")
+        st.subheader("📜 Zombi Boss – Komplette Strategie", anchor="zombi-boss--komplette-strategie")
         st.caption("Der Text wird direkt aus der Datei „Zombi Boss.txt“ geladen und hier angezeigt.")
 
         lines = zombi_boss_text.strip().split("\n")
